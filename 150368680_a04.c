@@ -16,25 +16,26 @@
 #include <semaphore.h>
 
 #define FILE_NAME "sample4_in.txt"
-#define CUSTOMER_COUNT 5
 
-int maximum[5][4];
+int customerCount;
+int **maximum;
 
-void readFile(char *fileName);
+void readFile(char *fileName, int m);
 int getCustomerCount(int **data);
 
 int main(int argc, char *argv[])
 {
-    if (argc < 4)
+    if (argc < 2)
     {
         printf("Not enough input parameters!\n");
         return -1;
     }
-    readFile(FILE_NAME);
-    for (int i = 0; i < CUSTOMER_COUNT; i++)
+    readFile(FILE_NAME, argc);
+    for (int i = 0; i < customerCount; i++)
     {
         for (int j = 0; j < 4; j++)
         {
+            // printf("%d", maximum[i][j]);
             printf("%d", maximum[i][j]);
         }
         printf("\n");
@@ -43,7 +44,7 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void readFile(char *fileName)
+void readFile(char *fileName, int m)
 {
     FILE *in = fopen(fileName, "r");
     if (!in)
@@ -65,11 +66,19 @@ void readFile(char *fileName)
         }
     }
     fclose(in);
-    char *lines[CUSTOMER_COUNT];
     char *command = NULL;
-    int i = 0;
     char *fileCopy = (char *)malloc((strlen(fileContent) + 1) * sizeof(char));
     strcpy(fileCopy, fileContent);
+    command = strtok(fileCopy, "\r\n");
+    while (command != NULL)
+    {
+        customerCount++;
+        command = strtok(NULL, "\r\n");
+    }
+    fileCopy = (char *)malloc((strlen(fileContent) + 1) * sizeof(char));
+    strcpy(fileCopy, fileContent);
+    char *lines[customerCount];
+    int i = 0;
     command = strtok(fileCopy, "\r\n");
     while (command != NULL)
     {
@@ -78,16 +87,19 @@ void readFile(char *fileName)
         i++;
         command = strtok(NULL, "\r\n");
     }
-    for (int j = 0; j < CUSTOMER_COUNT; j++)
+    maximum = malloc(sizeof(int *) * customerCount);
+    for (int j = 0; j < customerCount; j++)
     {
+        int *temp = malloc(sizeof(int) * m);
         char *token = NULL;
         int k = 0;
         token = strtok(lines[j], ",");
         while (token != NULL)
         {
-            maximum[j][k] = atoi(token);
+            temp[k] = atoi(token);
             k++;
             token = strtok(NULL, ",");
         }
+        maximum[j] = temp;
     }
 }

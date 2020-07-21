@@ -2,11 +2,11 @@
 
 CP386 Spring 2020 - Assignment 4 Code
 
-# Motivation
+## Motivation
 
 Code here is for Assignment 4 for our CP386 Spring 2020 class at Wilfrid Laurier University
 
-# Installation
+## Installation
 
 To install, clone the repository locally and navigate to it from your terminal.
 Then follow the instructions in the Makefile to compile; you can compile with the 2 commands:

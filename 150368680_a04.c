@@ -15,27 +15,41 @@
 #include <time.h>
 #include <semaphore.h>
 
-int readFile(char *fileName);
+#define FILE_NAME "sample4_in.txt"
+#define CUSTOMER_COUNT 5
+
+int maximum[5][4];
+
+void readFile(char *fileName);
+int getCustomerCount(int **data);
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 4)
     {
-        printf("Input file name missing...exiting with error code -1\n");
+        printf("Not enough input parameters!\n");
         return -1;
     }
-	int status = readFile(argv[1]);
-	printf("%d", status);
-	return 0;
+    readFile(FILE_NAME);
+    for (int i = 0; i < CUSTOMER_COUNT; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            printf("%d", maximum[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
 }
 
-int readFile(char *fileName)
+void readFile(char *fileName)
 {
-	FILE *in = fopen(fileName, "r");
+    FILE *in = fopen(fileName, "r");
     if (!in)
     {
         printf("Child A: Error in opening input file...exiting with error code -1\n");
-        return -1;
+        return;
     }
 
     struct stat st;
@@ -50,16 +64,30 @@ int readFile(char *fileName)
             strncat(fileContent, line, strlen(line));
         }
     }
-	fclose(in);
+    fclose(in);
+    char *lines[CUSTOMER_COUNT];
     char *command = NULL;
+    int i = 0;
     char *fileCopy = (char *)malloc((strlen(fileContent) + 1) * sizeof(char));
     strcpy(fileCopy, fileContent);
     command = strtok(fileCopy, "\r\n");
     while (command != NULL)
     {
-		printf("%s", command);
-		printf("\n");
+        lines[i] = malloc(sizeof(command) * sizeof(char));
+        strcpy(lines[i], command);
+        i++;
         command = strtok(NULL, "\r\n");
     }
-	return 0;
+    for (int j = 0; j < CUSTOMER_COUNT; j++)
+    {
+        char *token = NULL;
+        int k = 0;
+        token = strtok(lines[j], ",");
+        while (token != NULL)
+        {
+            maximum[j][k] = atoi(token);
+            k++;
+            token = strtok(NULL, ",");
+        }
+    }
 }

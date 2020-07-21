@@ -15,13 +15,16 @@
 #include <time.h>
 #include <semaphore.h>
 
+#define MAX_INPUT_SIZE 256
 #define FILE_NAME "sample4_in.txt"
 
 int customerCount;
+int resourceCount;
 int **maximum;
+int *available;
 
-void readFile(char *fileName, int m);
-int getCustomerCount(int **data);
+void readFile(char *fileName);
+void printMaximum();
 
 int main(int argc, char *argv[])
 {
@@ -30,21 +33,57 @@ int main(int argc, char *argv[])
         printf("Not enough input parameters!\n");
         return -1;
     }
-    readFile(FILE_NAME, argc);
-    for (int i = 0; i < customerCount; i++)
+    resourceCount = argc - 1;
+    available = malloc(sizeof(int) * resourceCount);
+    for (int i = 1; i < argc; i++)
     {
-        for (int j = 0; j < 4; j++)
-        {
-            // printf("%d", maximum[i][j]);
-            printf("%d", maximum[i][j]);
-        }
-        printf("\n");
+        available[i - 1] = atoi(argv[i]);
     }
 
+    readFile(FILE_NAME);
+
+    // START OF PROGRAM
+    char *userCommand = malloc(sizeof(char) * MAX_INPUT_SIZE);
+
+    printf("Number of Customers: %d\n", customerCount);
+    printf("Currently Available resources: ");
+    for (int i = 0; i < resourceCount; i++)
+    {
+        printf("%d ", available[i]);
+    }
+    printf("\n");
+    printf("Maximum resources from file:\n");
+    printMaximum();
+    while (strcmp(userCommand, "exit"))
+    {
+        printf("Enter Command: ");
+        fgets(userCommand, MAX_INPUT_SIZE, stdin);
+        if (strlen(userCommand) > 0 && userCommand[strlen(userCommand) - 1] == '\n')
+        {
+            userCommand[strlen(userCommand) - 1] = '\0';
+        }
+        printf("%s\n", userCommand); //DELETE LATER
+        // HANDLE USER INPUTTED PROGRAM HERE
+    }
     return 0;
 }
 
-void readFile(char *fileName, int m)
+void printMaximum()
+{
+
+    for (int i = 0; i < customerCount; i++)
+    {
+        for (int j = 0; j < resourceCount; j++)
+        {
+            printf("%d", maximum[i][j]);
+            if (j < resourceCount - 1)
+                printf(",");
+        }
+        printf("\n");
+    }
+}
+
+void readFile(char *fileName)
 {
     FILE *in = fopen(fileName, "r");
     if (!in)
@@ -75,7 +114,6 @@ void readFile(char *fileName, int m)
         customerCount++;
         command = strtok(NULL, "\r\n");
     }
-    fileCopy = (char *)malloc((strlen(fileContent) + 1) * sizeof(char));
     strcpy(fileCopy, fileContent);
     char *lines[customerCount];
     int i = 0;
@@ -90,7 +128,7 @@ void readFile(char *fileName, int m)
     maximum = malloc(sizeof(int *) * customerCount);
     for (int j = 0; j < customerCount; j++)
     {
-        int *temp = malloc(sizeof(int) * m);
+        int *temp = malloc(sizeof(int) * resourceCount);
         char *token = NULL;
         int k = 0;
         token = strtok(lines[j], ",");

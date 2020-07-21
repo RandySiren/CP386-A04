@@ -27,11 +27,15 @@ or you can compile with warnings allowed
 make warnings_OK
 ```
 
+---
+
 You can delete before recompiling to ensure clean compiling by running:
 
 ```bash
 make clean
 ```
+
+---
 
 Then to run the program, simply:
 

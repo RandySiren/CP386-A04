@@ -21,6 +21,7 @@
 int customerCount;
 int resourceCount;
 int **maximum;
+int **allocation;
 int *available;
 
 void readFile(char *fileName);
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
     }
 
     readFile(FILE_NAME);
+    allocation = malloc(sizeof(int *) * customerCount);
 
     // START OF PROGRAM
     char *userCommand = malloc(sizeof(char) * MAX_INPUT_SIZE);
@@ -54,7 +56,7 @@ int main(int argc, char *argv[])
     printf("\n");
     printf("Maximum resources from file:\n");
     printMaximum();
-    while (strcmp(userCommand, "exit"))
+    while (1)
     {
         printf("Enter Command: ");
         fgets(userCommand, MAX_INPUT_SIZE, stdin);
@@ -62,8 +64,23 @@ int main(int argc, char *argv[])
         {
             userCommand[strlen(userCommand) - 1] = '\0';
         }
-        printf("%s\n", userCommand); //DELETE LATER
         // HANDLE USER INPUTTED PROGRAM HERE
+        if (strcmp(userCommand, "RQ") == 0)
+        {
+        }
+        else if (strcmp(userCommand, "RL") == 0)
+        {
+        }
+        else if (strcmp(userCommand, "*") == 0)
+        {
+        }
+        else if (strcmp(userCommand, "exit") == 0)
+        {
+            return 0;
+        }
+        {
+            printf("\"%s\" is not a valid input, enter one of [\"RQ\",\"RL\",\"*\"].\n", userCommand);
+        }
     }
     return 0;
 }

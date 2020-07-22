@@ -45,6 +45,6 @@ Then to run the program, simply:
 
 Replacing the a,b,c parameters with any amount of integers to act as the available resources.
 
-# Contributors
+## Contributors
 
 > Mandeep Sran (RandySiren on GitHub)

@@ -24,8 +24,9 @@ int **maximum;
 int **allocation;
 int *available;
 
-void readFile(char *fileName);
-void printMaximum();
+int **readFile(char *fileName);
+void printDoublePointerData(int **data, int m, int n);
+void printSinglePointerData(int *data, int m);
 
 int main(int argc, char *argv[])
 {
@@ -35,49 +36,102 @@ int main(int argc, char *argv[])
         return -1;
     }
     resourceCount = argc - 1;
+
+    // Initialize available array
     available = malloc(sizeof(int) * resourceCount);
     for (int i = 1; i < argc; i++)
     {
         available[i - 1] = atoi(argv[i]);
     }
 
-    readFile(FILE_NAME);
-    allocation = malloc(sizeof(int *) * customerCount);
+    // Initialize maximum array by reading file and assigning values
+    maximum = readFile(FILE_NAME);
 
-    // START OF PROGRAM
+    // Initialize allocation array
+    allocation = malloc(sizeof(int *) * customerCount);
+    for (int i = 0; i < customerCount; i++)
+    {
+        allocation[i] = malloc(sizeof(int) * resourceCount);
+    }
+
+    /**
+     * 
+     * START OF PROGRAM
+     * 
+     * */
     char *userCommand = malloc(sizeof(char) * MAX_INPUT_SIZE);
 
     printf("Number of Customers: %d\n", customerCount);
     printf("Currently Available resources: ");
-    for (int i = 0; i < resourceCount; i++)
-    {
-        printf("%d ", available[i]);
-    }
-    printf("\n");
+    printSinglePointerData(available, resourceCount);
     printf("Maximum resources from file:\n");
-    printMaximum();
+    printDoublePointerData(maximum, customerCount, resourceCount);
+    // Loop to continue running until "exit" is inputted
     while (1)
     {
         printf("Enter Command: ");
         fgets(userCommand, MAX_INPUT_SIZE, stdin);
+        // Replace new line character with end of line character
         if (strlen(userCommand) > 0 && userCommand[strlen(userCommand) - 1] == '\n')
         {
             userCommand[strlen(userCommand) - 1] = '\0';
         }
-        // HANDLE USER INPUTTED PROGRAM HERE
-        if (strcmp(userCommand, "RQ") == 0)
+        /**
+         * 
+         * HANDLE USER INPUT CASES BELOW
+         * 
+         * */
+        if (strstr(userCommand, "RQ"))
+        {
+            // Split tokens by space to insert into allocation array
+            int *inputArray = malloc(sizeof(int) * (resourceCount + 1));
+            char *token = NULL;
+            token = strtok(userCommand, " ");
+            for (int i = 0; i <= resourceCount + 1; i++)
+            {
+                if (i > 0)
+                {
+                    inputArray[i - 1] = atoi(token);
+                }
+                token = strtok(NULL, " ");
+            }
+
+            // Insert into allocation array
+            int customerToAllocate = inputArray[0];
+            if (customerToAllocate < customerCount)
+            {
+                for (int i = 0; i < resourceCount; i++)
+                {
+                    allocation[customerToAllocate][i] = inputArray[i + 1];
+                }
+            }
+            else
+            {
+                printf("Thread out of bounds, please try again.\n");
+            }
+            free(inputArray);
+            // Determine if request would be satisfied or denied with safety algorithm
+        }
+        else if (strstr(userCommand, "RL"))
         {
         }
-        else if (strcmp(userCommand, "RL") == 0)
+        else if (strstr(userCommand, "*"))
+        {
+            printf("Available Resources:\n");
+            printSinglePointerData(available, resourceCount);
+            printf("Maxmium Resources:\n");
+            printDoublePointerData(maximum, customerCount, resourceCount);
+            printf("Allocated Resources:\n");
+            printDoublePointerData(allocation, customerCount, resourceCount);
+        }
+        else if (strstr(userCommand, "Run"))
         {
         }
-        else if (strcmp(userCommand, "*") == 0)
-        {
-        }
-        else if (strcmp(userCommand, "exit") == 0)
+        else if (strstr(userCommand, "exit"))
         {
             return 0;
         }
+        else
         {
             printf("\"%s\" is not a valid input, enter one of [\"RQ\",\"RL\",\"*\"].\n", userCommand);
         }
@@ -85,28 +139,38 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void printMaximum()
+void printDoublePointerData(int **data, int m, int n)
 {
-
-    for (int i = 0; i < customerCount; i++)
+    for (int i = 0; i < m; i++)
     {
-        for (int j = 0; j < resourceCount; j++)
+        for (int j = 0; j < n; j++)
         {
-            printf("%d", maximum[i][j]);
-            if (j < resourceCount - 1)
-                printf(",");
+            printf("%d", data[i][j]);
+            if (j < n - 1)
+                printf(" ");
         }
         printf("\n");
     }
 }
 
-void readFile(char *fileName)
+void printSinglePointerData(int *data, int m)
+{
+    for (int i = 0; i < m; i++)
+    {
+        printf("%d", data[i]);
+        if (i < m - 1)
+            printf(" ");
+    }
+    printf("\n");
+}
+
+int **readFile(char *fileName)
 {
     FILE *in = fopen(fileName, "r");
     if (!in)
     {
         printf("Child A: Error in opening input file...exiting with error code -1\n");
-        return;
+        return NULL;
     }
 
     struct stat st;
@@ -142,7 +206,7 @@ void readFile(char *fileName)
         i++;
         command = strtok(NULL, "\r\n");
     }
-    maximum = malloc(sizeof(int *) * customerCount);
+    int **max = malloc(sizeof(int *) * customerCount);
     for (int j = 0; j < customerCount; j++)
     {
         int *temp = malloc(sizeof(int) * resourceCount);
@@ -155,6 +219,7 @@ void readFile(char *fileName)
             k++;
             token = strtok(NULL, ",");
         }
-        maximum[j] = temp;
+        max[j] = temp;
     }
+    return max;
 }

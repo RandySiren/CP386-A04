@@ -25,6 +25,7 @@ int resourceCount;
 int **maximum;
 int **allocation;
 int *available;
+int **need;
 
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);

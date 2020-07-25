@@ -26,6 +26,7 @@ int **maximum;
 int **allocation;
 int *available;
 int **need;
+int safe;
 
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
@@ -119,6 +120,8 @@ int main(int argc, char *argv[])
             }
             free(inputArray);
             // Determine if request would be satisfied or denied with safety algorithm
+            while (customerCount != 0) {
+                
         }
         else if (strstr(userCommand, "RL"))
         {

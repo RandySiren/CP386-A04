@@ -226,3 +226,7 @@ int **readFile(char *fileName)
     }
     return max;
 }
+
+void* threadrun(void *t) {
+
+}

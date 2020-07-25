@@ -27,6 +27,8 @@ int **allocation;
 int *available;
 int **need;
 int safe;
+int running*;
+int flag;
 
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
@@ -41,7 +43,12 @@ int main(int argc, char *argv[])
         return -1;
     }
     resourceCount = argc - 1;
-
+    
+    // Filling running array to keep track of processes running/waiting
+    for (int i = 0; i < resourceCount; i++){
+        running[i] = 1;
+    }
+    
     // Initialize available array
     available = malloc(sizeof(int) * resourceCount);
     for (int i = 1; i < argc; i++)
@@ -120,6 +127,31 @@ int main(int argc, char *argv[])
             }
             free(inputArray);
             // Determine if request would be satisfied or denied with safety algorithm
+            while (customerCount != 0) {
+                safe = 0;
+                for (int i = 0; i < resourceCount; i++) {
+                    if (running[i]) {
+                        flag = 1;
+                        for (int j = 0; j < resourceCount; j++) {
+                            if (need[i][j] > available[j]){
+                                flag = 0;
+                                break;
+                            }
+                        }
+                    if (flag){
+                        printf("\nProcess %d in execution\n", i + 1);
+                        running[i] = 0;
+                        customerCount--;
+                        safe = 1;
+                        
+                        for (int j = 0; j < resourceCount; j++) {
+                            available[j] += allocation[i][j];
+                        }
+                        break;
+                    }
+                    }
+                }
+        }
             
         else if (strstr(userCommand, "RL"))
         {

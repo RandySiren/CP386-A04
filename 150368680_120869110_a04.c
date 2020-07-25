@@ -30,6 +30,7 @@ int **need;
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
 void printSinglePointerData(int *data, int m);
+void* threadrun(void *t);
 
 int main(int argc, char *argv[])
 {
@@ -56,7 +57,11 @@ int main(int argc, char *argv[])
     {
         allocation[i] = malloc(sizeof(int) * resourceCount);
     }
-
+    
+    // Initialize need array
+    for (int i = 0; i < customerCount; i++){
+        need[i] = maximum[i] - available[i]
+    }
     /**
      * 
      * START OF PROGRAM

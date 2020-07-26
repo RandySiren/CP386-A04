@@ -27,7 +27,7 @@ int **allocation;
 int **need;
 int *available;
 
-char *getSafetySequence();
+int *getSafetySequence();
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
 void printSinglePointerData(int *data, int m);
@@ -137,6 +137,8 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "RL"))
         {
+            int *sequence = getSafetySequence();
+            printSinglePointerData(sequence, customerCount);
         }
         else if (strstr(userCommand, "*"))
         {
@@ -158,15 +160,68 @@ int main(int argc, char *argv[])
         }
         else
         {
-            printf("\"%s\" is not a valid input, enter one of [\"RQ\",\"RL\",\"*\"].\n", userCommand);
+            printf("\"%s\" is not a valid input, enter one of [\"RQ\",\"RL\",\"*\",\"Run\",\"exit\"].\n", userCommand);
         }
     }
     return 0;
 }
 
-char *getSafetySequence()
+int *getSafetySequence()
 {
-    return NULL;
+    // Safety sequence we will be returning, all -1 if unsafe
+    int *sequence = malloc(sizeof(int) * customerCount);
+    int *work = malloc(sizeof(int) * resourceCount);
+    int *finished = malloc(sizeof(int) * customerCount);
+
+    // Initialize work to what we have available
+    for (int i = 0; i < resourceCount; i++)
+    {
+        work[i] = available[i];
+    }
+
+    // Primary safety algorithm
+    int count = 0;
+    while (count < customerCount)
+    {
+        int isSafe = 0;
+        for (int i = 0; i < customerCount; i++)
+        {
+            if (finished[i] == 0)
+            {
+                int safeIteration = 1;
+                for (int j = 0; j < resourceCount; j++)
+                {
+                    if (need[i][j] > work[j])
+                    {
+                        safeIteration = 0;
+                        break;
+                    }
+                }
+                if (safeIteration == 1)
+                {
+                    sequence[count] = i;
+                    finished[i] = 1;
+                    count++;
+                    isSafe = 1;
+                    for (int j = 0; j < resourceCount; j++)
+                    {
+                        work[j] += allocation[i][j];
+                    }
+                }
+            }
+        }
+        // Set safety sequence to -1 and return if no safe sequence found
+        if (isSafe == 0)
+        {
+            for (int k = 0; k < customerCount; k++)
+            {
+                sequence[k] = -1;
+            }
+            return sequence;
+        }
+    }
+
+    return sequence;
 }
 
 void printDoublePointerData(int **data, int m, int n)

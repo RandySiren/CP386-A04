@@ -28,6 +28,8 @@ int **need;
 int *available;
 int *sequence;
 
+int safe;
+
 int *getSafetySequence();
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
@@ -60,6 +62,9 @@ int main(int argc, char *argv[])
         allocation[i] = malloc(sizeof(int) * resourceCount);
         need[i] = malloc(sizeof(int) * resourceCount);
     }
+
+    // Initialize safe as 1 since no resources are allocated
+    safe = 1;
 
     /**
      * 
@@ -106,8 +111,8 @@ int main(int argc, char *argv[])
                 count++;
             }
 
-            // Insert into allocation array
             int customerToAllocate = inputArray[0];
+            // Insert into allocation array
             if (customerToAllocate < customerCount && count == resourceCount + 2)
             {
                 for (int i = 0; i < resourceCount; i++)
@@ -134,6 +139,17 @@ int main(int argc, char *argv[])
             }
             free(inputArray);
             // Determine if request would be satisfied or denied with safety algorithm
+            sequence = getSafetySequence();
+            if (sequence[0] == -1)
+            {
+                safe = 0;
+                printf("Warning: Unsafe state, please fix before running.");
+            }
+            else
+            {
+                safe = 1;
+                printf("Request is satisfied, state is safe.");
+            }
         }
         else if (strstr(userCommand, "RL"))
         {

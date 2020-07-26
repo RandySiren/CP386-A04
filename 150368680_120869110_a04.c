@@ -24,8 +24,10 @@ int customerCount;
 int resourceCount;
 int **maximum;
 int **allocation;
+int **need;
 int *available;
 
+char *getSafetySequence();
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
 void printSinglePointerData(int *data, int m);
@@ -49,11 +51,13 @@ int main(int argc, char *argv[])
     // Initialize maximum array by reading file and assigning values
     maximum = readFile(FILE_NAME);
 
-    // Initialize allocation array
+    // Initialize allocation array and need array
     allocation = malloc(sizeof(int *) * customerCount);
+    need = malloc(sizeof(int *) * customerCount);
     for (int i = 0; i < customerCount; i++)
     {
         allocation[i] = malloc(sizeof(int) * resourceCount);
+        need[i] = malloc(sizeof(int) * resourceCount);
     }
 
     /**
@@ -68,6 +72,7 @@ int main(int argc, char *argv[])
     printSinglePointerData(available, resourceCount);
     printf("Maximum resources from file:\n");
     printDoublePointerData(maximum, customerCount, resourceCount);
+
     // Loop to continue running until "exit" is inputted
     while (1)
     {
@@ -86,30 +91,46 @@ int main(int argc, char *argv[])
         if (strstr(userCommand, "RQ"))
         {
             // Split tokens by space to insert into allocation array
+            int count = 0;
             int *inputArray = malloc(sizeof(int) * (resourceCount + 1));
             char *token = NULL;
             token = strtok(userCommand, " ");
-            for (int i = 0; i <= resourceCount + 1; i++)
+            while (token != NULL)
             {
-                if (i > 0)
+                if (count > 0)
                 {
-                    inputArray[i - 1] = atoi(token);
+                    inputArray[count - 1] = atoi(token);
                 }
                 token = strtok(NULL, " ");
+                count++;
             }
 
             // Insert into allocation array
             int customerToAllocate = inputArray[0];
-            if (customerToAllocate < customerCount)
+            if (customerToAllocate < customerCount && count == resourceCount + 2)
             {
                 for (int i = 0; i < resourceCount; i++)
                 {
                     allocation[customerToAllocate][i] = inputArray[i + 1];
+                    need[customerToAllocate][i] = maximum[customerToAllocate][i] - allocation[customerToAllocate][i];
+                    if (need[customerToAllocate][i] < 0)
+                    {
+                        need[customerToAllocate][i] = 0;
+                    }
                 }
             }
             else
             {
-                printf("Thread out of bounds, please try again.\n");
+                if (customerToAllocate >= customerCount)
+                {
+
+                    printf("Thread out of bounds, please try again.\n");
+                }
+                else
+                {
+
+                    printf("Incorrect parameter count, please try again.\n");
+                }
             }
             free(inputArray);
             // Determine if request would be satisfied or denied with safety algorithm
@@ -125,6 +146,8 @@ int main(int argc, char *argv[])
             printDoublePointerData(maximum, customerCount, resourceCount);
             printf("Allocated Resources:\n");
             printDoublePointerData(allocation, customerCount, resourceCount);
+            printf("Need Resources:\n");
+            printDoublePointerData(need, customerCount, resourceCount);
         }
         else if (strstr(userCommand, "Run"))
         {
@@ -139,6 +162,11 @@ int main(int argc, char *argv[])
         }
     }
     return 0;
+}
+
+char *getSafetySequence()
+{
+    return NULL;
 }
 
 void printDoublePointerData(int **data, int m, int n)

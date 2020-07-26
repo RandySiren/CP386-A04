@@ -48,3 +48,4 @@ Replacing the a,b,c parameters with any amount of integers to act as the availab
 ## Contributors
 
 > Mandeep Sran (RandySiren on GitHub)
+> Raman Kala (ramankala on GitHub)

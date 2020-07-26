@@ -26,6 +26,7 @@ int **maximum;
 int **allocation;
 int **need;
 int *available;
+int *sequence;
 
 int *getSafetySequence();
 int **readFile(char *fileName);
@@ -113,6 +114,7 @@ int main(int argc, char *argv[])
                 {
                     allocation[customerToAllocate][i] = inputArray[i + 1];
                     need[customerToAllocate][i] = maximum[customerToAllocate][i] - allocation[customerToAllocate][i];
+                    // Don't let need values become negative
                     if (need[customerToAllocate][i] < 0)
                     {
                         need[customerToAllocate][i] = 0;
@@ -123,12 +125,10 @@ int main(int argc, char *argv[])
             {
                 if (customerToAllocate >= customerCount)
                 {
-
                     printf("Thread out of bounds, please try again.\n");
                 }
                 else
                 {
-
                     printf("Incorrect parameter count, please try again.\n");
                 }
             }
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "RL"))
         {
-            int *sequence = getSafetySequence();
+            sequence = getSafetySequence();
             printSinglePointerData(sequence, customerCount);
         }
         else if (strstr(userCommand, "*"))
@@ -156,6 +156,11 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "exit"))
         {
+            free(maximum);
+            free(allocation);
+            free(need);
+            free(available);
+            free(sequence);
             return 0;
         }
         else
@@ -217,10 +222,13 @@ int *getSafetySequence()
             {
                 sequence[k] = -1;
             }
+            free(work);
+            free(finished);
             return sequence;
         }
     }
-
+    free(work);
+    free(finished);
     return sequence;
 }
 

@@ -34,6 +34,20 @@ int *getSafetySequence();
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
 void printSinglePointerData(int *data, int m);
+void startClock();
+long getCurrentTime();
+time_t programClock;
+int threadsLeft(Thread* threads, int threadCount);
+int threadToStart(Thread* threads, int threadCount);
+void* threadRun(void* t);
+
+typedef struct thread {
+    unsigned int startTime;
+    unsigned int timeLeft;
+    int state;
+    pthread_t handle;
+    int retVal;
+} Thread;
 
 int main(int argc, char *argv[])
 {
@@ -50,10 +64,8 @@ int main(int argc, char *argv[])
     {
         available[i - 1] = atoi(argv[i]);
     }
-
     // Initialize maximum array by reading file and assigning values
     maximum = readFile(FILE_NAME);
-
     // Initialize allocation array and need array
     allocation = malloc(sizeof(int *) * customerCount);
     need = malloc(sizeof(int *) * customerCount);
@@ -169,6 +181,16 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "Run"))
         {
+            Thread* threads= NULL;
+            int threadCount = readFile(argv[1], &threads);
+            while (threadsLeft(threads, threadCount) > 0) {
+                int i = 0;
+                while ((i = threadToStart(threads, threadCount)) > -1) {
+                    threads[i].state = 1;
+                    threads.retVal = pthread_create(&(threads[i].handle) NULL, threadRun, &threads[i]);
+                }
+            }
+    
         }
         else if (strstr(userCommand, "exit"))
         {
@@ -304,6 +326,7 @@ int **readFile(char *fileName)
         customerCount++;
         command = strtok(NULL, "\r\n");
     }
+    *threads = (Thread*) malloc(sizeof(Thread) * customerCount);
     strcpy(fileCopy, fileContent);
     char *lines[customerCount];
     int i = 0;
@@ -324,6 +347,13 @@ int **readFile(char *fileName)
         token = strtok(lines[j], ",");
         while (token != NULL)
         {
+            (*threads)[j].state = 0;
+            if (k == 0){
+                (*threads)[j].startTime=atoi(token);
+            }
+            if (k == 1) {
+                (*threads[j].timeLeft=atoi(token);
+            }
             temp[k] = atoi(token);
             k++;
             token = strtok(NULL, ",");
@@ -331,4 +361,27 @@ int **readFile(char *fileName)
         max[j] = temp;
     }
     return max;
+}
+int threadsLeft(Thread* threads, int threadCount){
+    int threadsRemaining = 0;
+    for (int i = 0; i < threadCount; i++) {
+        if (threads[i].state > -1) {
+            threadsRemaining++;
+        }
+    }
+    return threadsRemaining;
+}
+int threadToStart(Thread* threads, int threadCount){
+    for (int i = 0; i < threadCount; i++) {
+        if (threads[i].state==0 && threads[i].startTime == getCurrentTime()) {
+            return i;
+        }
+    }
+    return -1;
+}
+void* threadRun(void* t) {
+    while (getCurrentTime() - ((Thread*)t) -> startTime < ((Thread*)t) -> timeLeft){
+        ((Thread*)t) -> state = -1;
+        pthread_exit(0);
+    }
 }

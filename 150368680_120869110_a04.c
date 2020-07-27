@@ -63,8 +63,8 @@ int main(int argc, char *argv[])
         need[i] = malloc(sizeof(int) * resourceCount);
     }
 
-    // Initialize safe as 1 since no resources are allocated
-    safe = 1;
+    // Initialize safe as 0 since no resources are allocated
+    safe = 0;
 
     /**
      * 

@@ -1,8 +1,10 @@
 /**
  *
  * Mandeep Sran
+ * GitHub Login ID:  RandySiren 
  * 150368680
  * Raman Kala
+ * GitHub Login ID: ramankala
  * 120869110
  * July 15, 2020
  * CP386 - Operating Systems Assignment 4

@@ -30,6 +30,7 @@ int *sequence;
 
 int safe;
 
+void *threadRun(void *t);
 int *getSafetySequence();
 int **readFile(char *fileName);
 void printDoublePointerData(int **data, int m, int n);
@@ -140,15 +141,16 @@ int main(int argc, char *argv[])
             free(inputArray);
             // Determine if request would be satisfied or denied with safety algorithm
             sequence = getSafetySequence();
+            printf("Request satisfied.\n");
             if (sequence[0] == -1)
             {
                 safe = 0;
-                printf("Warning: Unsafe state, please fix before running.");
+                printf("Warning: Unsafe state, please fix before running.\n");
             }
             else
             {
                 safe = 1;
-                printf("Request is satisfied, state is safe.");
+                printf("Info: State is now safe.\n");
             }
         }
         else if (strstr(userCommand, "RL"))
@@ -169,6 +171,23 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "Run"))
         {
+            sequence = getSafetySequence();
+            if (safe == 1)
+            {
+                for (int i = 0; i < customerCount; i++)
+                {
+                    int threadToRun = sequence[i];
+                    pthread_t tid;
+                    pthread_attr_t attr;
+                    pthread_attr_init(&attr);
+                    pthread_create(&tid, &attr, threadRun, (void *)&threadToRun);
+                    pthread_join(tid, NULL);
+                }
+            }
+            else
+            {
+                printf("Warning: Unsafe state, please fix before running.\n");
+            }
         }
         else if (strstr(userCommand, "exit"))
         {
@@ -185,6 +204,46 @@ int main(int argc, char *argv[])
         }
     }
     return 0;
+}
+
+void *threadRun(void *t)
+{
+    int *threadId = (int *)t;
+    printf("--> Customer: %d\n", *threadId);
+    printf("    Allocated Resouces: ");
+    for (int i = 0; i < resourceCount; i++)
+    {
+        printf("%d ", allocation[*threadId][i]);
+    }
+    printf("\n");
+    printf("    Needed Resources: ");
+    for (int i = 0; i < resourceCount; i++)
+    {
+        printf("%d ", need[*threadId][i]);
+    }
+    printf("\n");
+    printf("    Available Resources: ");
+    for (int i = 0; i < resourceCount; i++)
+    {
+        printf("%d ", available[i]);
+    }
+    printf("\n");
+    printf("    Thread has started...\n");
+    sleep(1);
+    printf("    Thread has finished...\n");
+    sleep(1);
+    printf("    Thread is releasing resources...\n");
+    sleep(1);
+    printf("    New Available Resources: ");
+    for (int i = 0; i < resourceCount; i++)
+    {
+        available[i] += allocation[*threadId][i];
+        printf("%d ", available[i]);
+    }
+    printf("\n\n");
+    sleep(1);
+
+    pthread_exit(NULL);
 }
 
 int *getSafetySequence()
@@ -331,43 +390,4 @@ int **readFile(char *fileName)
         max[j] = temp;
     }
     return max;
-}
-void *threadRun(void *t)
-{
-    int *threadId = (int *)t;
-    printf("--> Customer: %d\n", *threadId);
-    printf("    Allocated Resouces: ");
-    for (int i = 0; i < resourceCount; i++)
-    {
-        printf("%d ", allocation[*threadId][i]);
-    }
-    printf("\n");
-    printf("    Needed Resources: ");
-    for (int i = 0; i < resourceCount; i++)
-    {
-        printf("%d ", need[*threadId][i]);
-    }
-    printf("\n");
-    printf("    Available Resources: ");
-    for (int i = 0; i < resourceCount; i++)
-    {
-        printf("%d ", available[i]);
-    }
-    printf("\n");
-    printf("    Thread has started...\n");
-    sleep(1);
-    printf("    Thread has finished...\n");
-    sleep(1);
-    printf("    Thread is releasing resources...\n");
-    sleep(1);
-    printf("    New Available Resources: ");
-    for (int i = 0; i < resourceCount; i++)
-    {
-        available[i] += allocation[*threadId][i];
-        printf("%d ", available[i]);
-    }
-    printf("\n\n");
-    sleep(1);
-
-    pthread_exit(NULL);
 }

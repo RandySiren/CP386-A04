@@ -155,8 +155,64 @@ int main(int argc, char *argv[])
         }
         else if (strstr(userCommand, "RL"))
         {
+            // Split tokens by space to remove from allocation array
+            int count = 0;
+            int *inputArray = malloc(sizeof(int) * (resourceCount + 1));
+            char *token = NULL;
+            token = strtok(userCommand, " ");
+            while (token != NULL)
+            {
+                if (count > 0)
+                {
+                    inputArray[count - 1] = atoi(token);
+                }
+                token = strtok(NULL, " ");
+                count++;
+            }
+
+            int customerToAllocate = inputArray[0];
+            // Remove from allocation array
+            if (customerToAllocate < customerCount && count == resourceCount + 2)
+            {
+                for (int i = 0; i < resourceCount; i++)
+                {
+                    if (inputArray[i + 1] <= allocation[customerToAllocate][i])
+                    {
+                        allocation[customerToAllocate][i] -= inputArray[i + 1];
+                        need[customerToAllocate][i] = maximum[customerToAllocate][i] - allocation[customerToAllocate][i];
+                    }
+                    else
+                    {
+                        printf("You cannot release more resources than allocated.\n");
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (customerToAllocate >= customerCount)
+                {
+                    printf("Thread out of bounds, please try again.\n");
+                }
+                else
+                {
+                    printf("Incorrect parameter count, please try again.\n");
+                }
+            }
+            free(inputArray);
+            // Determine if request would be satisfied or denied with safety algorithm
             sequence = getSafetySequence();
-            printSinglePointerData(sequence, customerCount);
+            printf("Request satisfied.\n");
+            if (sequence[0] == -1)
+            {
+                safe = 0;
+                printf("Warning: Unsafe state, please fix before running.\n");
+            }
+            else
+            {
+                safe = 1;
+                printf("Info: State is now safe.\n");
+            }
         }
         else if (strstr(userCommand, "*"))
         {

@@ -49,3 +49,58 @@ Replacing the a,b,c parameters with any amount of integers to act as the availab
 
 > Mandeep Sran (RandySiren on GitHub)
 > Raman Kala (ramankala on GitHub)
+
+## Screenshots
+
+![Code](https://cdn.discordapp.com/attachments/670139641025921046/737414849750892544/unknown_2.png)
+
+## Individual Contributions
+* main- Mandeep/Raman
+* threadRun- Raman
+* getSafetySequence- Mandeep/Raman
+* readFile-Mandeep
+* printDoublePointerData-Mandeep
+* printSinglePointerData-Raman
+
+## Features
+* Testing
+* Write
+* Input
+* Output
+
+## Tests
+See screenshot
+
+## Code Example
+Invoke program by passing number of available resources.
+```bash
+./Assignment_4 3 3 2
+```
+
+Command for requesting resources where the variables represents integers.
+```bash
+Enter Command: RQ a b c d
+```
+
+Command for listing available resources, allocated resources and needed resources.
+```bash
+Enter Command: *
+```
+Enter this command to run the threads.
+```bash
+Enter Command: Run
+```
+
+To exit the program, simply write the following command. 
+```bash
+Enter Command: Exit
+```
+## Authors
+* Mandeep Sran
+* Raman Kala
+
+## Credits
+* Mandeep Sran
+* Raman Kala
+
+## License
